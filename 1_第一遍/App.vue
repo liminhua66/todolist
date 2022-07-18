@@ -1,12 +1,8 @@
 <template>
   <section class="todoapp">
-    <TodoHeader @addTodo="addTodo" :list="list" />
+    <TodoHeader @addTodo="addTodo" />
     <TodoMain :list="showList" @delTodo="delTodo" />
-    <TodoFooter
-      :count="count"
-      @changeTodos="changeTodos"
-      @clearDone="clearDone"
-    />
+    <TodoFooter :count="count" @changeData="changeData" @clear="clear" />
   </section>
 </template>
 
@@ -27,8 +23,8 @@ export default {
   },
   data() {
     return {
-      list: JSON.parse(localStorage.getItem("todoList")) || [],
-      isSel: "",
+      list: JSON.parse(localStorage.getItem("todolist")) || [],
+      isSel: "all",
     };
   },
   methods: {
@@ -37,18 +33,20 @@ export default {
       this.list.unshift(todo);
     },
     delTodo(val) {
-      this.list = this.list.filter((ele) => ele.id != val);
+      const index = this.list.findIndex((ele) => ele.id == val);
+      this.list.splice(index, 1);
+      // this.list = this.list.map((item) => item.id !== val);
     },
-    changeTodos(str) {
+    changeData(str) {
       this.isSel = str;
     },
-    clearDone() {
-      this.list = this.list.filter((item) => !item.isDone);
+    clear() {
+      return (this.list = this.list.filter((item) => !item.isDone));
     },
   },
   computed: {
     count() {
-      return this.list.filter((ele) => ele.isDone == true).length;
+      return this.list.filter((item) => !item.isDone).length;
     },
     showList() {
       if (this.isSel === "yes") {
@@ -64,7 +62,7 @@ export default {
     list: {
       deep: true,
       handler() {
-        localStorage.setItem("todoList", JSON.stringify(this.list));
+        localStorage.setItem("todolist", JSON.stringify(this.list));
       },
     },
   },
